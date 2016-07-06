@@ -5,7 +5,10 @@
 int main()
 {
 	RemoveCursor();
-	CreateNewBlock();
+	DrawBoard();
+
+	//SetDownDelay(10000);
+	//CreateNewBlock();
 
 	return 0;
 }

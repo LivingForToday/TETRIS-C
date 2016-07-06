@@ -7,26 +7,40 @@
 #include "BlockModel.h"
 #include "tetris.h"
 
-int CUR_BLOCK_IDX;
-int CUR_X_POS;
-int CUR_Y_POS;
+#define UP		72
+#define LEFT	75
+#define RIGHT	77
+#define DOWN	80
+#define SPACE	32
+#define ESC		27
+#define BOARD_WIDTH		20
+#define BOARD_HEIGHT	30
+#define BOARD_ORIGIN_X	4
+#define BOARD_ORIGIN_Y	2
+
+static int CUR_BLOCK_IDX;
+static int CUR_X_POS;
+static int CUR_Y_POS;
+static int DOWN_DELAY;
+
+void SetDownDelay(int delay)
+{
+	DOWN_DELAY = delay;
+}
 
 void ShowBlock(char blockInfo[][4])
 {
 	int y, x;
-	//COORD curPos = GetCurrentCursorPos();
 
 	for (y = 0; y < 4; y++)
 	{
 		for (x = 0; x < 4; x++)
 		{
-			//SetCurrentCursorPos(curPos.X + (x * 2), curPos.Y + y);
 			SetCurrentCursorPos(CUR_X_POS + (x * 2), CUR_Y_POS + y);
 			if (blockInfo[y][x] == 1)
 				fputs("¡á", stdout);
 		}
 	}
-	//SetCurrentCursorPos(curPos.X, curPos.Y);
 	SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 }
 
@@ -85,7 +99,7 @@ void CreateNewBlock()
 
 	// create threads
 	hThread[0] = (HANDLE)_beginthreadex(NULL, 0, LowerBlock, NULL, 0, &threadID[0]);
-	hThread[1] = (HANDLE)_beginthreadex(NULL, 0, MoveAndRotateBlock, NULL, 0, &threadID[1]);
+	hThread[1] = (HANDLE)_beginthreadex(NULL, 0, ProcKbInput, NULL, 0, &threadID[1]);
 
 	WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
 
@@ -93,7 +107,7 @@ void CreateNewBlock()
 	CloseHandle(hThread[1]);
 }
 
-unsigned __stdcall MoveAndRotateBlock()
+unsigned __stdcall ProcKbInput()
 {
 	int n = 0; // 0 <= n <= 3
 	int inputNum;
@@ -109,27 +123,35 @@ unsigned __stdcall MoveAndRotateBlock()
 
 		inputNum = _getch();
 
-		if (inputNum == 75) //move to left
+		switch (inputNum)
 		{
+		case UP:	// rotate block
+			RemoveBlock();
+			n = (n + 1) % 4;
+			CUR_BLOCK_IDX = baseIdxOfCurBlock + n;
+			ShowBlock(blockModel[CUR_BLOCK_IDX]);
+			break;
+		
+		case LEFT:	// move block to left
 			RemoveBlock();
 			CUR_X_POS -= 2;
 			SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 			ShowBlock(blockModel[CUR_BLOCK_IDX]);
-		}
-		else if (inputNum == 77) //move to right
-		{
+			break;
+
+		case RIGHT:	//move block to right
 			RemoveBlock();
 			CUR_X_POS += 2;
 			SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 			ShowBlock(blockModel[CUR_BLOCK_IDX]);
-		}
-		else if (inputNum == 72) //rotate block
-		{
-			RemoveBlock();
-			n = (n + 1) % 4;
-			CUR_BLOCK_IDX = baseIdxOfCurBlock + n;
-			//SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
-			ShowBlock(blockModel[CUR_BLOCK_IDX]);
+			break;
+
+		case DOWN:	//move block down
+			break;
+
+		case SPACE:	//put block down on the bottom immediately 
+			break;
+
 		}
 	}
 	
@@ -145,8 +167,8 @@ unsigned __stdcall LowerBlock()
 		SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 		ShowBlock(blockModel[CUR_BLOCK_IDX]);
 
-		for (i = 0; i < 20000; i++)
-			for (j = 0; j < 20000; j++)
+		for (i = 0; i < DOWN_DELAY; i++)
+			for (j = 0; j < DOWN_DELAY; j++)
 				;
 
 		RemoveBlock();
@@ -154,4 +176,38 @@ unsigned __stdcall LowerBlock()
 	}
 	_endthreadex(0);
 	return 0;
+}
+
+void DrawBoard()
+{
+	int x, y;
+
+	for (y = 0; y <= BOARD_HEIGHT; y++)
+	{
+		SetCurrentCursorPos(BOARD_ORIGIN_X, BOARD_ORIGIN_Y+y);
+
+		if (y == BOARD_HEIGHT)
+			fputs("¦¦", stdout);
+		else
+			fputs("¦¢", stdout);
+	}
+
+	for (y = 0; y <= BOARD_HEIGHT; y++)
+	{
+		SetCurrentCursorPos(BOARD_ORIGIN_X + (BOARD_WIDTH + 1) * 2, BOARD_ORIGIN_Y + y);
+
+		if (y == BOARD_HEIGHT)
+			fputs("¦¥", stdout);
+		else
+			fputs("¦¢", stdout);
+	}
+
+	for (x = 1; x < BOARD_WIDTH + 1; x++)
+	{
+		SetCurrentCursorPos(BOARD_ORIGIN_X + x * 2, BOARD_ORIGIN_Y + BOARD_HEIGHT);
+
+		fputs("¦¡", stdout);
+	}
+
+	SetCurrentCursorPos(0, 0);
 }
