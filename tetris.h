@@ -3,19 +3,27 @@
 
 #include <Windows.h>
 
-#define INITIALL_X_POSITION		20
-#define INITIALL_Y_POSITION		3
+#define UP			72
+#define LEFT		75
+#define RIGHT		77
+#define DOWN		80
+#define SPACE		32
+#define ESC			27
+#define BOARD_WIDTH			20
+#define BOARD_HEIGHT		30
+#define BOARD_ORIGIN_X		4
+#define BOARD_ORIGIN_Y		2
+#define INITIALL_X_POSITION		22
+#define INITIALL_Y_POSITION		2
 
-void SetDownDelay(int delay);
-void ShowBlock(char blockInfo[][4]);
+void DrawBoard();
+
 void SetCurrentCursorPos(int x, int y);
 COORD GetCurrentCursorPos();
-void RemoveBlock();
-void RemoveCursor();
+
 void CreateNewBlock();
 unsigned __stdcall ProcKbInput();
 unsigned __stdcall LowerBlock();
-void DrawBoard();
 
 #endif
 
