@@ -348,3 +348,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# additional ignore file
+*.vcxproj
+*.vcxproj.filters
