@@ -31,7 +31,7 @@ void DrawBoard()
 			fputs("¦¢", stdout);
 	}
 
-	for (x = 1; x < BOARD_WIDTH + 1; x++)
+	for (x = 1; x < BOARD_WIDTH + 1; x++) 
 	{
 		SetCurrentCursorPos(BOARD_ORIGIN_X + x * 2, BOARD_ORIGIN_Y + BOARD_HEIGHT);
 
@@ -76,6 +76,7 @@ unsigned __stdcall ProcKbInput()
 	int i, j;
 	int baseIdxOfCurBlock;
 	int delay;
+	int x, y;
 
 	GetCurrentBlockIdx(&baseIdxOfCurBlock);
 	delay = GetInputDelay();
@@ -102,21 +103,41 @@ unsigned __stdcall ProcKbInput()
 			break;
 		
 		case LEFT:	// move block to left
-			RemoveBlock();
-			SetCurrentXPos(-2);
-			ShowBlock();
+			GetCurrentXPos(&x);
+			if( x >= BOARD_ORIGIN_X + 3)
+			{
+				RemoveBlock();
+				SetCurrentXPos(-2);
+				MoveToLeft();
+				//ShowBlock();
+			}
+			else if (CheckMoveToLeftOneMoreCol() && (x-2) >= BOARD_ORIGIN_X)
+			{
+				RemoveBlock();
+				//SetCurrentXPos(-2);
+				MoveToLeft();
+			}
 			break;
 
 		case RIGHT:	//move block to right
-			RemoveBlock();
-			SetCurrentXPos(+2);
-			ShowBlock();
+			GetCurrentXPos(&x);
+			if (x <= BOARD_WIDTH * 2 - 4)
+			{
+				RemoveBlock();
+				SetCurrentXPos(+2);
+				ShowBlock();
+			}
 			break;
 
 		case DOWN:	//move block down
-			RemoveBlock();
-			SetCurrentYPos(+1);
-			ShowBlock();
+			GetCurrentYPos(&y);
+			if(y <= BOARD_HEIGHT - 2)
+			{
+				RemoveBlock();
+				SetCurrentYPos(+1); 
+				ShowBlock();
+			}
+
 			break;
 
 		case SPACE:	//put block down on the bottom immediately 

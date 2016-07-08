@@ -23,4 +23,7 @@ void GetCurrentBlockIdx(int * idx);
 void RemoveBlock();
 void ShowBlock();
 
+int CheckMoveToLeftOneMoreCol();
+void MoveToLeft();
+
 #endif

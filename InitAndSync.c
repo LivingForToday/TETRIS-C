@@ -84,22 +84,25 @@ int GetInputDelay()
 // funtions which set or update shared data
 void SetCurrentYPos(int y)
 {
-	WaitForSingleObject(Y_POS_MUTEX, INFINITE);
+		
+		WaitForSingleObject(Y_POS_MUTEX, INFINITE);
 
-	CUR_Y_POS += y;
-	SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
+		CUR_Y_POS += y;
+		SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 
-	ReleaseMutex(Y_POS_MUTEX);
+		ReleaseMutex(Y_POS_MUTEX);
 }
 
 void SetCurrentXPos(int x)
 {
-	WaitForSingleObject(X_POS_MUTEX, INFINITE);
 
-	CUR_X_POS += x;
-	SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
+		WaitForSingleObject(X_POS_MUTEX, INFINITE);
 
-	ReleaseMutex(X_POS_MUTEX);
+		CUR_X_POS += x;
+		SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
+
+		ReleaseMutex(X_POS_MUTEX);
+
 }
 
 void SetCurrentBlockIdx(int idx)
@@ -174,13 +177,68 @@ void ShowBlock()
 	{
 		for (x = 0; x < 4; x++)
 		{
+			
 			SetCurrentCursorPos(CUR_X_POS + (x * 2), CUR_Y_POS + y);
-			if (blockInfo[y][x] == 1)
-				fputs("бс", stdout);
+			if (blockInfo[y][x] == 1) {
+				fputs("бс", stdout);				
+			}
 		}
 	}
 	SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
 
 	// free mutex lock
 	ReleaseMutex(SCREEN_MUTEX);
+}
+
+int CheckMoveToLeftOneMoreCol()
+{
+	int i;
+
+	for (i = 0; i < NUM_OF_BLOCKS_ONE_COL_ZERO; i++)
+	{
+		if (blocksHavingOneColZero[i] == CUR_BLOCK_IDX)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void MoveToLeft()
+{
+	int n = 0;
+	int i, x, y;
+	char(*blockInfo)[4] = blockModel[CUR_BLOCK_IDX];
+
+	//whether the values of column 1 are all zero or not.
+	//if zero, the starting point of x is 1 or if not zero, it starts from 0. 
+	for (i = 0; i < NUM_OF_BLOCKS_ONE_COL_ZERO; i++)
+	{
+		if (blocksHavingOneColZero[i] == CUR_BLOCK_IDX)
+		{
+			n = 1;
+			break;
+		}
+	}
+
+	if (n == 1) // all values of column 1 are zero, so the inner loop starts from 1.
+	{
+	//	puts("zz");
+		//WaitForSingleObject(SCREEN_MUTEX, INFINITE);
+		SetCurrentXPos(-2);
+		for (y = 0; y < 4; y++)
+		{
+			for (x = 1; x < 4; x++)
+			{
+			//	puts("hh");
+				SetCurrentCursorPos(CUR_X_POS + (x * 2), CUR_Y_POS + y);
+				if (blockInfo[y][x] == 1) {
+					fputs("бс", stdout);
+				}
+			}
+		}
+		SetCurrentCursorPos(CUR_X_POS, CUR_Y_POS);
+	}
+	else
+	{
+		ShowBlock();
+	}
 }

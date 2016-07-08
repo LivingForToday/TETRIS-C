@@ -9,12 +9,17 @@
 #define DOWN		80
 #define SPACE		32
 #define ESC			27
+
 #define BOARD_WIDTH			20
 #define BOARD_HEIGHT		30
 #define BOARD_ORIGIN_X		4
 #define BOARD_ORIGIN_Y		2
+
 #define INITIALL_X_POSITION		22
 #define INITIALL_Y_POSITION		2
+
+#define TRUE	1
+#define FALSE	0
 
 void DrawBoard();
 

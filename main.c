@@ -18,7 +18,7 @@ int main()
 	DrawBoard();
 
 	// set the speed at which a block goes down
-	SetDownDelay(11000);
+	SetDownDelay(20000);
 
 	// set the sensetivity of keyboard input
 	SetInputDelay(3500);
